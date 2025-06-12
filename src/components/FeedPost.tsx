@@ -7,6 +7,9 @@ import {
   Send,
   Forward,
   MessageCircleMore,
+  X,
+  MoreVertical,
+  MoreHorizontal,
 } from 'lucide-react-native';
 
 interface FeedPostProps {
@@ -28,11 +31,27 @@ const FeedPost = ({
 }: FeedPostProps) => {
   return (
     <View style={styles.feedPost}>
-      <View style={styles.postHeader}>
-        <Image source={{uri: imageUrl}} style={styles.avatar} />
-        <View>
-          <Text style={styles.username}>{username}</Text>
-          <Text style={styles.postTime}>{postTime}</Text>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}>
+        <View style={styles.postHeader}>
+          <Image source={{uri: imageUrl}} style={styles.avatar} />
+          <View>
+            <Text style={styles.username}>{username}</Text>
+            <Text style={styles.postTime}>{postTime}</Text>
+          </View>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+          }}>
+          <MoreHorizontal size={22} color={'#000'} />
+          <X size={22} color={'#000'} />
         </View>
       </View>
       <Text style={styles.postText}>{postText}</Text>
