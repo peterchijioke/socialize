@@ -1,6 +1,13 @@
 import {VideoIcon} from 'lucide-react-native';
-import React from 'react';
-import {View, Text, StyleSheet, Image, FlatList} from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 import Video from 'react-native-video';
 
 interface StoryItem {
@@ -9,6 +16,9 @@ interface StoryItem {
 }
 
 const Reels = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const stories: StoryItem[] = Array.from({length: 20}, (_, i) => ({
     id: i,
     label: `Story ${i + 1}`,
@@ -16,40 +26,33 @@ const Reels = () => {
 
   const renderStory = ({item}: {item: StoryItem}) => (
     <View style={styles.storyImage}>
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color="#2d2d8c" />
+        </View>
+      )}
       <Video
         source={{
           uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
         }}
-        style={StyleSheet.absoluteFill}
+        style={styles.video}
         resizeMode="cover"
         repeat
-        muted
+        onLoad={() => setIsLoading(false)}
+        onError={error => {
+          setError(error.error.errorString || 'Unknown error');
+          setIsLoading(false);
+        }}
       />
+      {error && <Text style={styles.errorText}>Error: {error}</Text>}
     </View>
   );
 
   return (
-    <View
-      style={{
-        width: '100%',
-        paddingVertical: 5,
-      }}>
-      <View
-        style={{
-          paddingHorizontal: 16,
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 5,
-        }}>
+    <View style={styles.container}>
+      <View style={styles.header}>
         <VideoIcon />
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: 600,
-            color: 'black',
-          }}>
-          Reels
-        </Text>
+        <Text style={styles.headerText}>Reels</Text>
       </View>
 
       <FlatList
@@ -66,6 +69,22 @@ const Reels = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    paddingVertical: 5,
+    gap: 8,
+  },
+  header: {
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  headerText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'black',
+  },
   storiesContainer: {
     paddingLeft: 10,
     marginBottom: 10,
@@ -74,11 +93,33 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
   },
   storyImage: {
-    width: 100,
-    height: 200,
-    borderRadius: 10,
+    width: 230,
+    height: 350,
+    borderRadius: 20,
     marginRight: 10,
     overflow: 'hidden',
+    padding: 5,
+    backgroundColor: '#f0f0f0',
+  },
+  video: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    textAlign: 'center',
     padding: 5,
   },
   storyLabel: {
