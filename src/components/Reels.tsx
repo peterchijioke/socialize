@@ -1,3 +1,4 @@
+import {VideoIcon} from 'lucide-react-native';
 import React from 'react';
 import {View, Text, StyleSheet, Image, FlatList} from 'react-native';
 import Video from 'react-native-video';
@@ -36,7 +37,11 @@ const Reels = () => {
       <View
         style={{
           paddingHorizontal: 16,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 5,
         }}>
+        <VideoIcon />
         <Text
           style={{
             fontSize: 16,
