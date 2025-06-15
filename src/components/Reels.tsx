@@ -89,9 +89,9 @@ const styles = StyleSheet.create({
   storiesContainer: {
     paddingLeft: 10,
     marginBottom: 10,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 3,
-    paddingBottom: 15,
+    // borderBottomColor: '#ccc',
+    // borderBottomWidth: 3,
+    // paddingBottom: 15,
   },
   storyImage: {
     width: 230,
