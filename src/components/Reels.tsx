@@ -7,6 +7,7 @@ import {
   Image,
   FlatList,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import Video from 'react-native-video';
 
@@ -25,7 +26,7 @@ const Reels = () => {
   }));
 
   const renderStory = ({item}: {item: StoryItem}) => (
-    <View style={styles.storyImage}>
+    <TouchableOpacity style={styles.storyImage}>
       {isLoading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="small" color="#2d2d8c" />
@@ -45,7 +46,7 @@ const Reels = () => {
         }}
       />
       {error && <Text style={styles.errorText}>Error: {error}</Text>}
-    </View>
+    </TouchableOpacity>
   );
 
   return (
