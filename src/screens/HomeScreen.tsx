@@ -6,7 +6,8 @@ import Feed from '../components/Feed';
 import TopBar from '../components/TopBar';
 import NavigationBar from '../components/NavigationBar';
 import StatusInput from '../components/StatusInput';
-
+import Reels from '../components/Reels';
+export const HomeScreenName = 'HomeScreen';
 const HomeScreen = () => {
   const image_url = 'https://github.com/shadcn.png';
   const [activeTab, setActiveTab] = useState('home');
@@ -14,6 +15,7 @@ const HomeScreen = () => {
   return (
     <>
       <KeyboardAwareScrollView
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingBottom: 25,
         }}

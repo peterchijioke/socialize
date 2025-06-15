@@ -1,8 +1,14 @@
-import React from 'react';
-import HomeScreen from './src/screens/HomeScreen';
-
-const App = () => {
-  return <HomeScreen />;
-};
-
-export default App;
+import * as React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import RootStack from './src/navigation/RootStack';
+import {SheetProvider} from 'react-native-actions-sheet';
+import './sheets';
+export default function App() {
+  return (
+    <SheetProvider>
+      <NavigationContainer>
+        <RootStack />
+      </NavigationContainer>
+    </SheetProvider>
+  );
+}

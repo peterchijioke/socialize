@@ -1,5 +1,14 @@
-import React from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import React, {useState, useRef, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Share,
+  Linking,
+  Platform,
+} from 'react-native';
 import {
   ThumbsUp,
   MessageCircle,
@@ -10,15 +19,24 @@ import {
   X,
   MoreVertical,
   MoreHorizontal,
+  Play,
+  Pause,
 } from 'lucide-react-native';
+import {SheetManager} from 'react-native-actions-sheet';
+import Video from 'react-native-video';
 
 interface FeedPostProps {
   username: string;
   postTime: string;
   postText: string;
   imageUrl: string;
+  videoUrl?: string;
   likes?: number;
   comments?: number;
+  isLast?: boolean;
+  type: 'image' | 'video';
+  onRemove?: () => void;
+  isVideoPlaying: boolean;
 }
 
 const FeedPost = ({
@@ -26,16 +44,91 @@ const FeedPost = ({
   postTime,
   postText,
   imageUrl,
+  videoUrl,
   likes = 0,
   comments = 0,
+  isLast = false,
+  type,
+  onRemove,
+  isVideoPlaying,
 }: FeedPostProps) => {
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(likes);
+  const [isPaused, setIsPaused] = useState(false);
+  const [showControls, setShowControls] = useState(false);
+  const hideControlsTimeout = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const handleLike = () => {
+    setIsLiked(!isLiked);
+    setLikeCount(prev => (isLiked ? prev - 1 : prev + 1));
+  };
+
+  const handleVideoPress = () => {
+    setIsPaused(!isPaused);
+    setShowControls(true);
+    resetHideControlsTimeout();
+  };
+
+  const resetHideControlsTimeout = () => {
+    if (hideControlsTimeout.current) {
+      clearTimeout(hideControlsTimeout.current);
+    }
+    hideControlsTimeout.current = setTimeout(() => {
+      if (!isPaused) {
+        setShowControls(false);
+      }
+    }, 2000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (hideControlsTimeout.current) {
+        clearTimeout(hideControlsTimeout.current);
+      }
+    };
+  }, []);
+
+  const handleShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `${username}'s post: ${postText}`,
+        url: imageUrl,
+      });
+    } catch (error) {
+      console.error('Error sharing post:', error);
+    }
+  };
+
+  const handleWhatsAppShare = async () => {
+    try {
+      const message = `${username}'s post: ${postText}`;
+      const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
+
+      const canOpen = await Linking.canOpenURL(whatsappUrl);
+      if (canOpen) {
+        await Linking.openURL(whatsappUrl);
+      } else {
+        const storeUrl = Platform.select({
+          ios: 'https://apps.apple.com/app/whatsapp-messenger/id310633997',
+          android: 'market://details?id=com.whatsapp',
+        });
+        if (storeUrl) {
+          await Linking.openURL(storeUrl);
+        }
+      }
+    } catch (error) {
+      console.error('Error sharing to WhatsApp:', error);
+    }
+  };
+
   return (
-    <View style={styles.feedPost}>
+    <View style={[styles.feedPost, isLast && styles.lastFeedPost]}>
       <View
         style={{
           flex: 1,
           flexDirection: 'row',
           justifyContent: 'space-between',
+          paddingHorizontal: 15,
         }}>
         <View style={styles.postHeader}>
           <Image source={{uri: imageUrl}} style={styles.avatar} />
@@ -50,17 +143,55 @@ const FeedPost = ({
             alignItems: 'center',
             gap: 6,
           }}>
-          <MoreHorizontal size={22} color={'#000'} />
-          <X size={22} color={'#000'} />
+          <TouchableOpacity
+            onPress={() => {
+              SheetManager.show('card-sheet');
+            }}>
+            <MoreHorizontal size={22} color={'#000'} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onRemove}>
+            <X size={22} color={'#000'} />
+          </TouchableOpacity>
         </View>
       </View>
-      <Text style={styles.postText}>{postText}</Text>
-      <Image source={{uri: imageUrl}} style={styles.postImage} />
+      <View
+        style={{
+          paddingHorizontal: 15,
+          width: '100%',
+        }}>
+        <Text style={styles.postText}>{postText}</Text>
+      </View>
+
+      {type === 'video' && videoUrl ? (
+        <TouchableOpacity
+          style={styles.videoContainer}
+          onPress={handleVideoPress}
+          activeOpacity={1}>
+          <Video
+            source={{uri: videoUrl}}
+            style={styles.video}
+            resizeMode="cover"
+            paused={isPaused || !isVideoPlaying}
+            repeat={true}
+          />
+          {(showControls || isPaused) && (
+            <View style={styles.playButton}>
+              {isPaused ? (
+                <Play size={40} color="#fff" />
+              ) : (
+                <Pause size={40} color="#fff" />
+              )}
+            </View>
+          )}
+        </TouchableOpacity>
+      ) : (
+        <Image source={{uri: imageUrl}} style={styles.postImage} />
+      )}
 
       <View style={styles.interactionBar}>
         <View style={styles.interactionStats}>
           <ThumbsUp size={16} color="#1877F2" />
-          <Text style={styles.interactionText}>{likes}</Text>
+          <Text style={styles.interactionText}>{likeCount}</Text>
         </View>
         <View style={styles.interactionStats}>
           <Text style={styles.interactionText}>{comments} comments</Text>
@@ -68,20 +199,28 @@ const FeedPost = ({
       </View>
 
       <View style={styles.actionButtons}>
-        <TouchableOpacity style={styles.actionButton}>
-          <ThumbsUp size={24} color="#65676B" />
-          <Text style={styles.actionButtonText}>Like</Text>
+        <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
+          <ThumbsUp size={24} color={isLiked ? '#1877F2' : '#65676B'} />
+          <Text style={[styles.actionButtonText, isLiked && styles.likedText]}>
+            Like
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          onPress={() => {
+            SheetManager.show('comment-sheet');
+          }}
+          style={styles.actionButton}>
           <MessageCircle size={24} color="#65676B" />
           <Text style={styles.actionButtonText}>Comment</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={handleWhatsAppShare}>
           <MessageCircleMore size={24} color="#65676B" />
           <Text style={styles.actionButtonText}>Send</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
           <Forward size={24} color="#65676B" />
           <Text style={styles.actionButtonText}>Share</Text>
         </TouchableOpacity>
@@ -92,9 +231,13 @@ const FeedPost = ({
 
 const styles = StyleSheet.create({
   feedPost: {
-    paddingHorizontal: 15,
     backgroundColor: '#fff',
     marginBottom: 10,
+    borderBottomWidth: 3,
+    borderBottomColor: '#ccc',
+  },
+  lastFeedPost: {
+    borderBottomWidth: 0,
   },
   postHeader: {
     flexDirection: 'row',
@@ -119,15 +262,31 @@ const styles = StyleSheet.create({
   },
   postImage: {
     width: '100%',
-    height: 200,
-    borderRadius: 10,
+    height: 250,
+  },
+  videoContainer: {
+    width: '100%',
+    height: 250,
+    position: 'relative',
+  },
+  video: {
+    width: '100%',
+    height: '100%',
+  },
+  playButton: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{translateX: -20}, {translateY: -20}],
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 40,
+    padding: 10,
   },
   interactionBar: {
     flexDirection: 'row',
+    paddingHorizontal: 10,
     justifyContent: 'space-between',
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E4E6EB',
   },
   interactionStats: {
     flexDirection: 'row',
@@ -142,6 +301,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 10,
+    paddingHorizontal: 15,
   },
   actionButton: {
     flexDirection: 'row',
@@ -153,6 +313,9 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     color: '#65676B',
     fontSize: 14,
+  },
+  likedText: {
+    color: '#1877F2',
   },
 });
 
