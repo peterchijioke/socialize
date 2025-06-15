@@ -128,6 +128,15 @@ const Feed = () => {
         viewabilityConfig={viewabilityConfig}
       />
       <Reels />
+      <FlatList
+        nestedScrollEnabled
+        data={posts}
+        renderItem={renderPost}
+        keyExtractor={item => item.id.toString()}
+        showsVerticalScrollIndicator={false}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+      />
     </View>
   );
 };
