@@ -34,7 +34,7 @@ const Reels = () => {
       )}
       <Video
         source={{
-          uri: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+          uri: 'https://www.w3schools.com/html/mov_bbb.mp4',
         }}
         style={styles.video}
         resizeMode="cover"

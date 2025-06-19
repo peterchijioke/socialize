@@ -8,6 +8,8 @@ import {
   Share,
   Linking,
   Platform,
+  Animated,
+  Easing,
 } from 'react-native';
 import {
   ThumbsUp,
@@ -57,6 +59,60 @@ const FeedPost = ({
   const [isPaused, setIsPaused] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const hideControlsTimeout = useRef<ReturnType<typeof setTimeout>>(null);
+
+  // Animation values
+  const headerAnim = useRef(new Animated.Value(0)).current;
+  const textAnim = useRef(new Animated.Value(0)).current;
+  const mediaAnim = useRef(new Animated.Value(0)).current;
+  const barAnim = useRef(new Animated.Value(0)).current;
+  const buttonsAnim = useRef(new Animated.Value(0)).current;
+
+  // Icon rotation animation
+  const iconRotateAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Staggered animation for each section
+    Animated.stagger(100, [
+      Animated.timing(headerAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+      Animated.timing(textAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+      Animated.timing(mediaAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+      Animated.timing(barAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+      Animated.timing(buttonsAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+    ]).start();
+
+    // Icon rotation animation
+    Animated.timing(iconRotateAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+      easing: Easing.out(Easing.ease),
+    }).start();
+  }, [headerAnim, textAnim, mediaAnim, barAnim, buttonsAnim, iconRotateAnim]);
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -123,12 +179,21 @@ const FeedPost = ({
 
   return (
     <View style={[styles.feedPost, isLast && styles.lastFeedPost]}>
-      <View
+      <Animated.View
         style={{
           flex: 1,
           flexDirection: 'row',
           justifyContent: 'space-between',
           paddingHorizontal: 15,
+          opacity: headerAnim,
+          transform: [
+            {
+              translateY: headerAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [20, 0],
+              }),
+            },
+          ],
         }}>
         <View style={styles.postHeader}>
           <Image source={{uri: imageUrl}} style={styles.avatar} />
@@ -153,42 +218,108 @@ const FeedPost = ({
             <X size={22} color={'#000'} />
           </TouchableOpacity>
         </View>
-      </View>
-      <View
+      </Animated.View>
+      <Animated.View
         style={{
           paddingHorizontal: 15,
           width: '100%',
+          opacity: textAnim,
+          transform: [
+            {
+              translateY: textAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [20, 0],
+              }),
+            },
+          ],
         }}>
-        <Text style={styles.postText}>{postText}</Text>
-      </View>
+        <Animated.Text
+          style={[
+            styles.postText,
+            {
+              opacity: textAnim,
+              transform: [
+                {
+                  translateY: textAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [20, 0],
+                  }),
+                },
+              ],
+            },
+          ]}>
+          {postText}
+        </Animated.Text>
+      </Animated.View>
 
-      {type === 'video' && videoUrl ? (
-        <TouchableOpacity
-          style={styles.videoContainer}
-          onPress={handleVideoPress}
-          activeOpacity={1}>
-          <Video
-            source={{uri: videoUrl}}
-            style={styles.video}
-            resizeMode="cover"
-            paused={isPaused || !isVideoPlaying}
-            repeat={true}
+      <Animated.View
+        style={{
+          opacity: mediaAnim,
+          transform: [
+            {
+              translateY: mediaAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [20, 0],
+              }),
+            },
+          ],
+        }}>
+        {type === 'video' && videoUrl ? (
+          <TouchableOpacity
+            style={styles.videoContainer}
+            onPress={handleVideoPress}
+            activeOpacity={1}>
+            <Video
+              source={{uri: videoUrl}}
+              style={styles.video}
+              resizeMode="cover"
+              paused={isPaused || !isVideoPlaying}
+              repeat={true}
+            />
+            {(showControls || isPaused) && (
+              <View style={styles.playButton}>
+                {isPaused ? (
+                  <Play size={40} color="#fff" />
+                ) : (
+                  <Pause size={40} color="#fff" />
+                )}
+              </View>
+            )}
+          </TouchableOpacity>
+        ) : (
+          <Animated.Image
+            source={{uri: imageUrl}}
+            style={[
+              styles.postImage,
+              {
+                opacity: mediaAnim,
+                transform: [
+                  {
+                    translateY: mediaAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [20, 0],
+                    }),
+                  },
+                ],
+              },
+            ]}
           />
-          {(showControls || isPaused) && (
-            <View style={styles.playButton}>
-              {isPaused ? (
-                <Play size={40} color="#fff" />
-              ) : (
-                <Pause size={40} color="#fff" />
-              )}
-            </View>
-          )}
-        </TouchableOpacity>
-      ) : (
-        <Image source={{uri: imageUrl}} style={styles.postImage} />
-      )}
+        )}
+      </Animated.View>
 
-      <View style={styles.interactionBar}>
+      <Animated.View
+        style={{
+          ...styles.interactionBar,
+          opacity: barAnim,
+          transform: [
+            {
+              translateY: barAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [20, 0],
+              }),
+            },
+          ],
+        }}>
         <View style={styles.interactionStats}>
           <ThumbsUp size={16} color="#1877F2" />
           <Text style={styles.interactionText}>{likeCount}</Text>
@@ -196,11 +327,35 @@ const FeedPost = ({
         <View style={styles.interactionStats}>
           <Text style={styles.interactionText}>{comments} comments</Text>
         </View>
-      </View>
+      </Animated.View>
 
-      <View style={styles.actionButtons}>
+      <Animated.View
+        style={{
+          ...styles.actionButtons,
+          opacity: buttonsAnim,
+          transform: [
+            {
+              translateY: buttonsAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [20, 0],
+              }),
+            },
+          ],
+        }}>
         <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-          <ThumbsUp size={24} color={isLiked ? '#1877F2' : '#65676B'} />
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  rotate: iconRotateAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0deg', '360deg'],
+                  }),
+                },
+              ],
+            }}>
+            <ThumbsUp size={24} color={isLiked ? '#1877F2' : '#65676B'} />
+          </Animated.View>
           <Text style={[styles.actionButtonText, isLiked && styles.likedText]}>
             Like
           </Text>
@@ -211,20 +366,56 @@ const FeedPost = ({
             SheetManager.show('comment-sheet');
           }}
           style={styles.actionButton}>
-          <MessageCircle size={24} color="#65676B" />
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  rotate: iconRotateAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0deg', '360deg'],
+                  }),
+                },
+              ],
+            }}>
+            <MessageCircle size={24} color="#65676B" />
+          </Animated.View>
           <Text style={styles.actionButtonText}>Comment</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.actionButton}
           onPress={handleWhatsAppShare}>
-          <MessageCircleMore size={24} color="#65676B" />
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  rotate: iconRotateAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0deg', '360deg'],
+                  }),
+                },
+              ],
+            }}>
+            <MessageCircleMore size={24} color="#65676B" />
+          </Animated.View>
           <Text style={styles.actionButtonText}>Send</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-          <Forward size={24} color="#65676B" />
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  rotate: iconRotateAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0deg', '360deg'],
+                  }),
+                },
+              ],
+            }}>
+            <Forward size={24} color="#65676B" />
+          </Animated.View>
           <Text style={styles.actionButtonText}>Share</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     </View>
   );
 };

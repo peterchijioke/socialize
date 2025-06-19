@@ -17,8 +17,7 @@ interface Post {
 
 const Feed = () => {
   const image_url = 'https://github.com/shadcn.png';
-  const video_url =
-    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+  const video_url = 'https://www.w3schools.com/html/mov_bbb.mp4';
 
   const initialPosts: Post[] = [
     {
