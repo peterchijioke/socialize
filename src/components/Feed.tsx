@@ -17,7 +17,8 @@ interface Post {
 
 const Feed = () => {
   const image_url = 'https://github.com/shadcn.png';
-  const video_url = 'https://www.w3schools.com/html/mov_bbb.mp4';
+  const video_url =
+    'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4';
 
   const initialPosts: Post[] = [
     {

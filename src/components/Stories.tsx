@@ -17,12 +17,12 @@ interface StoryItem {
 const image_url = 'https://github.com/shadcn.png';
 
 const videoUrls = [
-  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
-  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+  'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4',
+  'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4',
+  'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4',
+  'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4',
+  'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4',
+  'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4',
 ];
 
 const StoryItemComponent = ({
@@ -30,7 +30,7 @@ const StoryItemComponent = ({
   videoUrl,
 }: {
   item: StoryItem;
-  videoUrl: string;
+  videoUrl: string | any;
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
