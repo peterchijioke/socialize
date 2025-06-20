@@ -6,8 +6,16 @@ const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
  *
  * @type {import('@react-native/metro-config').MetroConfig}
  */
-const config = {
-  resetCache: true,
+const config = async () => {
+  const defaultConfig = await getDefaultConfig(__dirname);
+  const {assetExts, sourceExts} = defaultConfig.resolver;
+  return mergeConfig(defaultConfig, {
+    resolver: {
+      assetExts: [...assetExts, 'mp4'],
+      sourceExts: sourceExts.filter(ext => ext !== 'mp4'),
+    },
+    resetCache: true,
+  });
 };
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+module.exports = config();

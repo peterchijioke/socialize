@@ -17,37 +17,67 @@ interface StoryItem {
 }
 
 const Reels = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadingStates, setLoadingStates] = useState<{[key: number]: boolean}>(
+    {},
+  );
+  const [errorStates, setErrorStates] = useState<{
+    [key: number]: string | null;
+  }>({});
 
   const stories: StoryItem[] = Array.from({length: 20}, (_, i) => ({
     id: i,
     label: `Story ${i + 1}`,
   }));
 
-  const renderStory = ({item}: {item: StoryItem}) => (
-    <TouchableOpacity style={styles.storyImage}>
-      {isLoading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color="#2d2d8c" />
-        </View>
-      )}
-      <Video
-        source={{
-          uri: 'https://www.w3schools.com/html/mov_bbb.mp4',
-        }}
-        style={styles.video}
-        resizeMode="cover"
-        repeat
-        onLoad={() => setIsLoading(false)}
-        onError={error => {
-          setError(error.error.errorString || 'Unknown error');
-          setIsLoading(false);
-        }}
-      />
-      {error && <Text style={styles.errorText}>Error: {error}</Text>}
-    </TouchableOpacity>
-  );
+  const videoUrls = [
+    'https://www.w3schools.com/html/mov_bbb.mp4',
+    'https://samplelib.com/mp4/sample-5s.mp4',
+    'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
+    'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4',
+    'https://www.appsloveworld.com/wp-content/uploads/2018/10/640.mp4',
+  ];
+
+  const setLoadingState = (id: number, loading: boolean) => {
+    setLoadingStates(prev => ({...prev, [id]: loading}));
+  };
+
+  const setErrorState = (id: number, error: string | null) => {
+    setErrorStates(prev => ({...prev, [id]: error}));
+  };
+
+  const renderStory = ({item, index}: {item: StoryItem; index: number}) => {
+    const isLoading = loadingStates[item.id] !== false; // Default to true if not set
+    const error = errorStates[item.id];
+    const videoUrl = videoUrls[index % videoUrls.length];
+
+    return (
+      <TouchableOpacity style={styles.storyImage}>
+        {isLoading && !error && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="small" color="#2d2d8c" />
+          </View>
+        )}
+        <Video
+          source={{uri: videoUrl}}
+          style={styles.video}
+          resizeMode="cover"
+          repeat
+          onLoadStart={() => setLoadingState(item.id, true)}
+          onReadyForDisplay={() => setLoadingState(item.id, false)}
+          onError={error => {
+            console.log('Video error:', error);
+            setErrorState(item.id, 'Failed to load video');
+            setLoadingState(item.id, false);
+          }}
+          onEnd={() => {
+            // Video ended, keep it loaded
+            setLoadingState(item.id, false);
+          }}
+        />
+        {error && <Text style={styles.errorText}>Error: {error}</Text>}
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -59,7 +89,7 @@ const Reels = () => {
       <FlatList
         nestedScrollEnabled
         data={stories}
-        renderItem={renderStory}
+        renderItem={({item, index}) => renderStory({item, index})}
         keyExtractor={item => item.id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -99,7 +129,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
     overflow: 'hidden',
-    padding: 5,
     backgroundColor: '#f0f0f0',
   },
   video: {

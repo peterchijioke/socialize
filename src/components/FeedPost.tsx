@@ -23,6 +23,8 @@ import {
   MoreHorizontal,
   Play,
   Pause,
+  Mic,
+  MicOff,
 } from 'lucide-react-native';
 import {SheetManager} from 'react-native-actions-sheet';
 import Video from 'react-native-video';
@@ -58,7 +60,11 @@ const FeedPost = ({
   const [likeCount, setLikeCount] = useState(likes);
   const [isPaused, setIsPaused] = useState(false);
   const [showControls, setShowControls] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
+  const [videoError, setVideoError] = useState(false);
   const hideControlsTimeout = useRef<ReturnType<typeof setTimeout>>(null);
+  const videoLoadTimeout = useRef<ReturnType<typeof setTimeout>>(null);
+  const [isMuted, setIsMuted] = useState(true);
 
   // Animation values
   const headerAnim = useRef(new Animated.Value(0)).current;
@@ -141,8 +147,18 @@ const FeedPost = ({
       if (hideControlsTimeout.current) {
         clearTimeout(hideControlsTimeout.current);
       }
+      if (videoLoadTimeout.current) {
+        clearTimeout(videoLoadTimeout.current);
+      }
     };
   }, []);
+
+  // Debug video URL
+  useEffect(() => {
+    if (type === 'video' && videoUrl) {
+      console.log('FeedPost: Video URL received:', videoUrl);
+    }
+  }, [type, videoUrl]);
 
   const handleShare = async () => {
     try {
@@ -176,6 +192,8 @@ const FeedPost = ({
       console.error('Error sharing to WhatsApp:', error);
     }
   };
+
+  const handleMicToggle = () => setIsMuted(m => !m);
 
   return (
     <View style={[styles.feedPost, isLast && styles.lastFeedPost]}>
@@ -270,20 +288,92 @@ const FeedPost = ({
             onPress={handleVideoPress}
             activeOpacity={1}>
             <Video
-              source={{uri: videoUrl}}
+              source={
+                videoUrl ? {uri: videoUrl} : require('../assets/mov_bbb.mp4')
+              }
               style={styles.video}
               resizeMode="cover"
               paused={isPaused || !isVideoPlaying}
               repeat={true}
+              muted={isMuted}
+              bufferConfig={{
+                minBufferMs: 15000,
+                maxBufferMs: 50000,
+                bufferForPlaybackMs: 2500,
+                bufferForPlaybackAfterRebufferMs: 5000,
+              }}
+              progressUpdateInterval={1000}
+              onLoadStart={() => {
+                console.log('Video load started for URL:', videoUrl);
+                setIsVideoLoading(true);
+                setVideoError(false);
+                // Set a timeout for video loading (30 seconds)
+                if (videoLoadTimeout.current) {
+                  clearTimeout(videoLoadTimeout.current);
+                }
+                videoLoadTimeout.current = setTimeout(() => {
+                  if (isVideoLoading) {
+                    setVideoError(true);
+                    setIsVideoLoading(false);
+                    console.warn('Video loading timeout for URL:', videoUrl);
+                  }
+                }, 30000);
+              }}
+              onLoad={() => {
+                console.log('Video loaded successfully for URL:', videoUrl);
+                setIsVideoLoading(false);
+                if (videoLoadTimeout.current) {
+                  clearTimeout(videoLoadTimeout.current);
+                }
+              }}
+              onError={e => {
+                console.error('Video error for URL:', videoUrl, e.error);
+                setVideoError(true);
+                setIsVideoLoading(false);
+                if (videoLoadTimeout.current) {
+                  clearTimeout(videoLoadTimeout.current);
+                }
+              }}
             />
-            {(showControls || isPaused) && (
-              <View style={styles.playButton}>
-                {isPaused ? (
-                  <Play size={40} color="#fff" />
-                ) : (
-                  <Pause size={40} color="#fff" />
-                )}
+            {isVideoLoading && (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>Loading video...</Text>
               </View>
+            )}
+            {videoError && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>Failed to load video</Text>
+                <TouchableOpacity
+                  style={styles.retryButton}
+                  onPress={() => {
+                    setVideoError(false);
+                    setIsVideoLoading(true);
+                    // Force re-render of video component
+                  }}>
+                  <Text style={styles.retryText}>Tap to retry</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {(showControls || isPaused) && !isVideoLoading && !videoError && (
+              <>
+                <View style={styles.playButton}>
+                  {isPaused ? (
+                    <Play size={40} color="#fff" />
+                  ) : (
+                    <Pause size={40} color="#fff" />
+                  )}
+                </View>
+                <TouchableOpacity
+                  style={styles.micButton}
+                  onPress={handleMicToggle}
+                  activeOpacity={0.7}>
+                  {isMuted ? (
+                    <MicOff size={28} color="#fff" />
+                  ) : (
+                    <Mic size={28} color="#fff" />
+                  )}
+                </TouchableOpacity>
+              </>
             )}
           </TouchableOpacity>
         ) : (
@@ -507,6 +597,58 @@ const styles = StyleSheet.create({
   },
   likedText: {
     color: '#1877F2',
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  errorContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  errorText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  retryButton: {
+    marginTop: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: '#1877F2',
+    borderRadius: 5,
+    alignSelf: 'center',
+  },
+  retryText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  micButton: {
+    position: 'absolute',
+    bottom: 18,
+    right: 18,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 20,
+    padding: 8,
+    zIndex: 10,
   },
 });
 

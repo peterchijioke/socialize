@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -14,46 +14,95 @@ interface StoryItem {
   label: string;
 }
 
-const Stories = () => {
+const image_url = 'https://github.com/shadcn.png';
+
+const videoUrls = [
+  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+];
+
+const StoryItemComponent = ({
+  item,
+  videoUrl,
+}: {
+  item: StoryItem;
+  videoUrl: string;
+}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const image_url = 'https://github.com/shadcn.png';
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        console.log('Timeout: Forcing spinner to hide after 5s');
+        setError('Loading timed out');
+        setIsLoading(false);
+      }
+    }, 5000);
+    return () => clearTimeout(timeout);
+  }, [isLoading]);
+
+  return (
+    <View style={styles.storyImage}>
+      <Video
+        source={{uri: videoUrl}}
+        style={styles.video}
+        resizeMode="cover"
+        repeat
+        muted
+        onLoad={() => setIsLoading(false)}
+        onError={err => {
+          console.log('Video Error:', err);
+          setError(err?.error?.errorString || 'Unknown error');
+          setIsLoading(false);
+        }}
+        bufferConfig={{
+          minBufferMs: 15000,
+          maxBufferMs: 50000,
+          bufferForPlaybackMs: 2500,
+          bufferForPlaybackAfterRebufferMs: 5000,
+        }}
+        maxBitRate={1000000}
+      />
+
+      {isLoading && (
+        <View style={styles.loadingContainer} pointerEvents="none">
+          <ActivityIndicator size="small" color="#2d2d8c" />
+        </View>
+      )}
+      {error && !isLoading && (
+        <Text style={styles.errorText}>Error: {error}</Text>
+      )}
+      <Image source={{uri: image_url}} style={styles.reelImage} />
+      <View style={styles.storyLabelContainer}>
+        <Text style={styles.storyLabel}>{item.label}</Text>
+      </View>
+    </View>
+  );
+};
+
+const Stories = () => {
   const stories: StoryItem[] = Array.from({length: 20}, (_, i) => ({
     id: i,
     label: `Story ${i + 1}`,
   }));
 
-  const renderStory = ({item}: {item: StoryItem}) => (
-    <View style={styles.storyImage}>
-      {isLoading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="small" color="#2d2d8c" />
-        </View>
-      )}
-      <Video
-        source={{uri: 'https://www.w3schools.com/html/mov_bbb.mp4'}}
-        style={styles.video}
-        resizeMode="cover"
-        repeat
-        onLoad={() => setIsLoading(false)}
-        onError={error => {
-          setError(error.error.errorString || 'Unknown error');
-          setIsLoading(false);
-        }}
-      />
-      <Image source={{uri: image_url}} style={styles.reelImage} />
-      <View style={styles.storyLabelContainer}>
-        <Text style={styles.storyLabel}>{item.label}</Text>
-      </View>
-      {error && <Text style={styles.errorText}>Error: {error}</Text>}
-    </View>
-  );
-
   return (
     <FlatList
+      nestedScrollEnabled
+      initialNumToRender={3}
+      windowSize={5}
       data={stories}
-      renderItem={renderStory}
+      renderItem={({item, index}) => (
+        <StoryItemComponent
+          item={item}
+          videoUrl={videoUrls[index % videoUrls.length]}
+        />
+      )}
       keyExtractor={item => item.id.toString()}
       horizontal
       showsHorizontalScrollIndicator={false}
@@ -76,7 +125,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginRight: 10,
     overflow: 'hidden',
-    padding: 5,
     backgroundColor: '#f0f0f0',
   },
   video: {
@@ -87,27 +135,33 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
+    zIndex: 1,
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: 'rgba(240,240,240,0.7)',
+    zIndex: 2,
   },
   errorText: {
     color: 'red',
     fontSize: 10,
     textAlign: 'center',
     padding: 2,
+    zIndex: 3,
   },
   storyLabel: {
     marginTop: 5,
     fontSize: 10,
-    fontFamily: 'bold',
+    fontWeight: 'bold',
     color: '#fff',
   },
   storyLabelContainer: {
     marginTop: 'auto',
+    zIndex: 4,
+    marginBottom: 5,
+    marginHorizontal: 5,
   },
   reelImage: {
     width: 25,
@@ -115,8 +169,10 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderColor: '#1877F2',
     borderWidth: 2,
-    marginTop: 3,
-    marginLeft: 3,
+
+    marginTop: 5,
+    marginLeft: 5,
+    zIndex: 4,
   },
 });
 
