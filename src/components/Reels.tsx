@@ -30,11 +30,11 @@ const Reels = () => {
   }));
 
   const videoUrls = [
-    'https://www.w3schools.com/html/mov_bbb.mp4',
-    'https://samplelib.com/mp4/sample-5s.mp4',
-    'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
-    'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4',
-    'https://www.appsloveworld.com/wp-content/uploads/2018/10/640.mp4',
+    'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4',
+    'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4',
+    'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4',
+    'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4',
+    'https://cdn.jsdelivr.net/gh/peterchijioke/socialize/mov_bbb%20(1).mp4',
   ];
 
   const setLoadingState = (id: number, loading: boolean) => {
@@ -62,6 +62,7 @@ const Reels = () => {
           style={styles.video}
           resizeMode="cover"
           repeat
+          muted
           onLoadStart={() => setLoadingState(item.id, true)}
           onReadyForDisplay={() => setLoadingState(item.id, false)}
           onError={error => {

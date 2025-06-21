@@ -74,9 +74,7 @@ const StoryItemComponent = ({
           <ActivityIndicator size="small" color="#2d2d8c" />
         </View>
       )}
-      {error && !isLoading && (
-        <Text style={styles.errorText}>Error: {error}</Text>
-      )}
+
       <Image source={{uri: image_url}} style={styles.reelImage} />
       <View style={styles.storyLabelContainer}>
         <Text style={styles.storyLabel}>{item.label}</Text>

@@ -288,9 +288,7 @@ const FeedPost = ({
             onPress={handleVideoPress}
             activeOpacity={1}>
             <Video
-              source={
-                videoUrl ? {uri: videoUrl} : require('../assets/mov_bbb.mp4')
-              }
+              source={{uri: videoUrl}}
               style={styles.video}
               resizeMode="cover"
               paused={isPaused || !isVideoPlaying}
