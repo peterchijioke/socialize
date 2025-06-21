@@ -2,7 +2,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
 } from 'react-native';
@@ -20,6 +19,7 @@ import {
 } from 'lucide-react-native';
 import {useNavigation} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
+import BouncyTouchable from './BouncyTouchable';
 
 const TopBar = () => {
   const navigation = useNavigation<DrawerNavigationProp<any>>();
@@ -41,17 +41,21 @@ const TopBar = () => {
   return (
     <View style={styles.topBar}>
       <View style={styles.logoMenu}>
-        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+        <BouncyTouchable onPress={() => navigation.openDrawer()}>
           <Menu color="#000" />
-        </TouchableOpacity>
+        </BouncyTouchable>
         <Text style={styles.logo}>Socialize</Text>
       </View>
       <View style={styles.topIcons}>
-        <TouchableOpacity onPress={() => setShowDropdown(true)}>
+        <BouncyTouchable onPress={() => setShowDropdown(true)}>
           <PlusCircle size={22} color="#000" style={styles.icon} />
-        </TouchableOpacity>
-        <Search size={22} color="#000" style={styles.icon} />
-        <MessageCircle color="#000" style={styles.icon} />
+        </BouncyTouchable>
+        <BouncyTouchable>
+          <Search size={22} color="#000" style={styles.icon} />
+        </BouncyTouchable>
+        <BouncyTouchable>
+          <MessageCircle color="#000" style={styles.icon} />
+        </BouncyTouchable>
       </View>
 
       <Modal
@@ -64,7 +68,7 @@ const TopBar = () => {
             <View style={styles.dropdownContainer}>
               {menuItems.map((item, index) => (
                 <React.Fragment key={item.id}>
-                  <TouchableOpacity
+                  <BouncyTouchable
                     style={styles.menuItem}
                     onPress={() => handleMenuItemPress(item.label)}>
                     <View style={styles.menuItemContent}>
@@ -75,7 +79,7 @@ const TopBar = () => {
                       />
                       <Text style={styles.menuItemText}>{item.label}</Text>
                     </View>
-                  </TouchableOpacity>
+                  </BouncyTouchable>
                   {index < menuItems.length - 1 && (
                     <View style={styles.separator} />
                   )}

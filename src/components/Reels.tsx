@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Video from 'react-native-video';
+import BouncyTouchable from './BouncyTouchable';
 
 interface StoryItem {
   id: number;
@@ -51,7 +52,7 @@ const Reels = () => {
     const videoUrl = videoUrls[index % videoUrls.length];
 
     return (
-      <TouchableOpacity style={styles.storyImage}>
+      <BouncyTouchable style={styles.storyImage}>
         {isLoading && !error && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="small" color="#2d2d8c" />
@@ -76,7 +77,7 @@ const Reels = () => {
           }}
         />
         {error && <Text style={styles.errorText}>Error: {error}</Text>}
-      </TouchableOpacity>
+      </BouncyTouchable>
     );
   };
 

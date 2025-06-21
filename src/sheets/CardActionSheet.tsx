@@ -1,12 +1,7 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import ActionSheet, {useScrollHandlers} from 'react-native-actions-sheet';
 import {NativeViewGestureHandler} from 'react-native-gesture-handler';
+import BouncyTouchable from '../components/BouncyTouchable';
 
 export default function CardActionSheet() {
   const handlers = useScrollHandlers();
@@ -35,7 +30,7 @@ export default function CardActionSheet() {
               </Text>
             </View>
 
-            <TouchableOpacity style={styles.item}>
+            <BouncyTouchable style={styles.item}>
               <View style={styles.iconContainer}>
                 <Text style={styles.icon}>+</Text>
               </View>
@@ -45,9 +40,9 @@ export default function CardActionSheet() {
                   More suggested posts in your feed will be like this.
                 </Text>
               </View>
-            </TouchableOpacity>
+            </BouncyTouchable>
 
-            <TouchableOpacity style={styles.item}>
+            <BouncyTouchable style={styles.item}>
               <View style={styles.iconContainer}>
                 <Text style={styles.icon}>−</Text>
               </View>
@@ -57,9 +52,9 @@ export default function CardActionSheet() {
                   Less suggested posts in your feed will be like this.
                 </Text>
               </View>
-            </TouchableOpacity>
+            </BouncyTouchable>
 
-            <TouchableOpacity style={styles.item}>
+            <BouncyTouchable style={styles.item}>
               <View style={styles.iconContainer}>
                 <Text style={styles.icon}>🏷️</Text>
               </View>
@@ -69,9 +64,9 @@ export default function CardActionSheet() {
                   Add this to your saved items.
                 </Text>
               </View>
-            </TouchableOpacity>
+            </BouncyTouchable>
 
-            <TouchableOpacity style={styles.item}>
+            <BouncyTouchable style={styles.item}>
               <View style={styles.iconContainer}>
                 <Text style={styles.icon}>✕</Text>
               </View>
@@ -81,9 +76,9 @@ export default function CardActionSheet() {
                   See fewer posts like this.
                 </Text>
               </View>
-            </TouchableOpacity>
+            </BouncyTouchable>
 
-            <TouchableOpacity style={styles.item}>
+            <BouncyTouchable style={styles.item}>
               <View style={styles.iconContainer}>
                 <Text style={styles.icon}>⚠️</Text>
               </View>
@@ -93,9 +88,9 @@ export default function CardActionSheet() {
                   We won't let AngieNation know who reported this.
                 </Text>
               </View>
-            </TouchableOpacity>
+            </BouncyTouchable>
 
-            <TouchableOpacity style={styles.item}>
+            <BouncyTouchable style={styles.item}>
               <View style={styles.iconContainer}>
                 <Text style={styles.icon}>🔔</Text>
               </View>
@@ -104,20 +99,20 @@ export default function CardActionSheet() {
                   Turn on notifications for this post
                 </Text>
               </View>
-            </TouchableOpacity>
+            </BouncyTouchable>
 
-            <TouchableOpacity style={styles.item}>
+            <BouncyTouchable style={styles.item}>
               <View style={styles.iconContainer}>
                 <Text style={styles.icon}>📄</Text>
               </View>
               <View style={styles.textContainer}>
                 <Text style={styles.itemTitle}>Copy link</Text>
               </View>
-            </TouchableOpacity>
+            </BouncyTouchable>
 
             <View style={styles.spacer} />
 
-            <TouchableOpacity style={styles.item}>
+            <BouncyTouchable style={styles.item}>
               <View style={styles.iconContainer}>
                 <Text style={styles.icon}>⏰</Text>
               </View>
@@ -129,9 +124,9 @@ export default function CardActionSheet() {
                   Temporarily stop seeing posts.
                 </Text>
               </View>
-            </TouchableOpacity>
+            </BouncyTouchable>
 
-            <TouchableOpacity style={styles.item}>
+            <BouncyTouchable style={styles.item}>
               <View style={styles.iconContainer}>
                 <Text style={styles.icon}>✕</Text>
               </View>
@@ -141,9 +136,9 @@ export default function CardActionSheet() {
                   Stop seeing posts from this Page.
                 </Text>
               </View>
-            </TouchableOpacity>
+            </BouncyTouchable>
 
-            <TouchableOpacity style={styles.item}>
+            <BouncyTouchable style={styles.item}>
               <View style={styles.iconContainer}>
                 <Text style={styles.icon}>👤</Text>
               </View>
@@ -155,16 +150,16 @@ export default function CardActionSheet() {
                   You won't be able to see or contact each other.
                 </Text>
               </View>
-            </TouchableOpacity>
+            </BouncyTouchable>
 
-            <TouchableOpacity style={styles.item}>
+            <BouncyTouchable style={styles.item}>
               <View style={styles.iconContainer}>
                 <Text style={styles.icon}>⚙️</Text>
               </View>
               <View style={styles.textContainer}>
                 <Text style={styles.itemTitle}>Manage your Feed</Text>
               </View>
-            </TouchableOpacity>
+            </BouncyTouchable>
           </View>
         </ScrollView>
       </NativeViewGestureHandler>

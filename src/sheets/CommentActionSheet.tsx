@@ -23,6 +23,7 @@ import ActionSheet, {
   FlatList,
   useScrollHandlers,
 } from 'react-native-actions-sheet';
+import BouncyTouchable from '../components/BouncyTouchable';
 
 interface Comment {
   id: number;
@@ -52,9 +53,9 @@ const CommentInteractions: React.FC<CommentInteractionsProps> = ({likes}) => {
           gap: 2,
         }}>
         <Text style={{color: 'black'}}>{likes}</Text>
-        <TouchableOpacity>
+        <BouncyTouchable>
           <ThumbsUp size={15} color={'blue'} />
-        </TouchableOpacity>
+        </BouncyTouchable>
       </View>
       <View
         style={{
@@ -62,9 +63,9 @@ const CommentInteractions: React.FC<CommentInteractionsProps> = ({likes}) => {
           alignItems: 'center',
           gap: 2,
         }}>
-        <TouchableOpacity>
+        <BouncyTouchable>
           <Heart size={15} color={'red'} />
-        </TouchableOpacity>
+        </BouncyTouchable>
       </View>
     </View>
   );
@@ -141,13 +142,13 @@ export default function CommentActionSheet() {
             justifyContent: 'space-between',
           }}>
           <View style={styles.commentActions}>
-            <TouchableOpacity>
+            <BouncyTouchable>
               <Text style={styles.actionText}>1d</Text>
-            </TouchableOpacity>
+            </BouncyTouchable>
             <Text style={styles.likesCount}>{item.likes} likes</Text>
-            <TouchableOpacity>
+            <BouncyTouchable>
               <Text style={styles.actionText}>Reply</Text>
-            </TouchableOpacity>
+            </BouncyTouchable>
           </View>
           <CommentInteractions likes={item.likes} />
         </View>
@@ -219,7 +220,7 @@ export default function CommentActionSheet() {
                   <UserRound size={20} />
                 </>
               </View>
-              <TouchableOpacity
+              <BouncyTouchable
                 style={[
                   styles.sendButton,
                   !commentText.trim() && styles.sendButtonDisabled,
@@ -230,7 +231,7 @@ export default function CommentActionSheet() {
                   size={20}
                   color={commentText.trim() ? '#1877F2' : '#65676B'}
                 />
-              </TouchableOpacity>
+              </BouncyTouchable>
             </>
           )}
         </View>

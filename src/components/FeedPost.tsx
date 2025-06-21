@@ -28,6 +28,7 @@ import {
 } from 'lucide-react-native';
 import {SheetManager} from 'react-native-actions-sheet';
 import Video from 'react-native-video';
+import BouncyTouchable from './BouncyTouchable';
 
 interface FeedPostProps {
   username: string;
@@ -226,15 +227,15 @@ const FeedPost = ({
             alignItems: 'center',
             gap: 6,
           }}>
-          <TouchableOpacity
+          <BouncyTouchable
             onPress={() => {
               SheetManager.show('card-sheet');
             }}>
             <MoreHorizontal size={22} color={'#000'} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onRemove}>
+          </BouncyTouchable>
+          <BouncyTouchable onPress={onRemove}>
             <X size={22} color={'#000'} />
-          </TouchableOpacity>
+          </BouncyTouchable>
         </View>
       </Animated.View>
       <Animated.View
@@ -283,7 +284,7 @@ const FeedPost = ({
           ],
         }}>
         {type === 'video' && videoUrl ? (
-          <TouchableOpacity
+          <BouncyTouchable
             style={styles.videoContainer}
             onPress={handleVideoPress}
             activeOpacity={1}>
@@ -341,7 +342,7 @@ const FeedPost = ({
             {videoError && (
               <View style={styles.errorContainer}>
                 <Text style={styles.errorText}>Failed to load video</Text>
-                <TouchableOpacity
+                <BouncyTouchable
                   style={styles.retryButton}
                   onPress={() => {
                     setVideoError(false);
@@ -349,7 +350,7 @@ const FeedPost = ({
                     // Force re-render of video component
                   }}>
                   <Text style={styles.retryText}>Tap to retry</Text>
-                </TouchableOpacity>
+                </BouncyTouchable>
               </View>
             )}
             {(showControls || isPaused) && !isVideoLoading && !videoError && (
@@ -361,7 +362,7 @@ const FeedPost = ({
                     <Pause size={40} color="#fff" />
                   )}
                 </View>
-                <TouchableOpacity
+                <BouncyTouchable
                   style={styles.micButton}
                   onPress={handleMicToggle}
                   activeOpacity={0.7}>
@@ -370,10 +371,10 @@ const FeedPost = ({
                   ) : (
                     <Mic size={28} color="#fff" />
                   )}
-                </TouchableOpacity>
+                </BouncyTouchable>
               </>
             )}
-          </TouchableOpacity>
+          </BouncyTouchable>
         ) : (
           <Animated.Image
             source={{uri: imageUrl}}
@@ -430,7 +431,7 @@ const FeedPost = ({
             },
           ],
         }}>
-        <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
+        <BouncyTouchable style={styles.actionButton} onPress={handleLike}>
           <Animated.View
             style={{
               transform: [
@@ -447,9 +448,9 @@ const FeedPost = ({
           <Text style={[styles.actionButtonText, isLiked && styles.likedText]}>
             Like
           </Text>
-        </TouchableOpacity>
+        </BouncyTouchable>
 
-        <TouchableOpacity
+        <BouncyTouchable
           onPress={() => {
             SheetManager.show('comment-sheet');
           }}
@@ -468,8 +469,8 @@ const FeedPost = ({
             <MessageCircle size={24} color="#65676B" />
           </Animated.View>
           <Text style={styles.actionButtonText}>Comment</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        </BouncyTouchable>
+        <BouncyTouchable
           style={styles.actionButton}
           onPress={handleWhatsAppShare}>
           <Animated.View
@@ -486,8 +487,8 @@ const FeedPost = ({
             <MessageCircleMore size={24} color="#65676B" />
           </Animated.View>
           <Text style={styles.actionButtonText}>Send</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
+        </BouncyTouchable>
+        <BouncyTouchable style={styles.actionButton} onPress={handleShare}>
           <Animated.View
             style={{
               transform: [
@@ -502,7 +503,7 @@ const FeedPost = ({
             <Forward size={24} color="#65676B" />
           </Animated.View>
           <Text style={styles.actionButtonText}>Share</Text>
-        </TouchableOpacity>
+        </BouncyTouchable>
       </Animated.View>
     </View>
   );
